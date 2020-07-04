@@ -1,7 +1,367 @@
 fileFormatVersion: 2
 guid: 86490c462f5e03a43ac3ace3fdc76503
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 3126791905082641082
+    second: chess_0
+  - first:
+      213: 9137956268137911521
+    second: chess_1
+  - first:
+      213: 1616936152527710571
+    second: chess_2
+  - first:
+      213: -5793913985548570082
+    second: chess_3
+  - first:
+      213: 5766394591597166826
+    second: chess_4
+  - first:
+      213: 7693799297890424256
+    second: chess_5
+  - first:
+      213: -7936563244626370059
+    second: chess_6
+  - first:
+      213: 7993996805980120978
+    second: chess_7
+  - first:
+      213: -1345350055374505554
+    second: chess_8
+  - first:
+      213: -2296480735062217309
+    second: chess_9
+  - first:
+      213: -7305132405902633686
+    second: chess_10
+  - first:
+      213: -8032995728034213270
+    second: chess_11
+  - first:
+      213: -8274431376720414474
+    second: chess_12
+  - first:
+      213: -4666670201959077835
+    second: chess_13
+  - first:
+      213: -7266684050984473096
+    second: chess_14
+  - first:
+      213: -2201836110270548584
+    second: chess_15
+  - first:
+      213: -746858761153659734
+    second: chess_16
+  - first:
+      213: -7676357686731682085
+    second: chess_17
+  - first:
+      213: -5711204960182633368
+    second: chess_18
+  - first:
+      213: 4452410842143523311
+    second: chess_19
+  - first:
+      213: 125714881482219297
+    second: chess_20
+  - first:
+      213: 3342984801492296073
+    second: chess_21
+  - first:
+      213: -486567125713048330
+    second: chess_22
+  - first:
+      213: -455283134209779126
+    second: chess_23
+  - first:
+      213: 7864484897005314037
+    second: chess_24
+  - first:
+      213: -9148152624085972738
+    second: chess_25
+  - first:
+      213: -147579243368145914
+    second: chess_26
+  - first:
+      213: 6246588548226012313
+    second: chess_27
+  - first:
+      213: 1448437197599695983
+    second: chess_28
+  - first:
+      213: -3046379028411308354
+    second: chess_29
+  - first:
+      213: -5420607081364566849
+    second: chess_30
+  - first:
+      213: -1536487855538411148
+    second: chess_31
+  - first:
+      213: 1953926954815455220
+    second: chess_32
+  - first:
+      213: 5862158627140416778
+    second: chess_33
+  - first:
+      213: 5919452669800816307
+    second: chess_34
+  - first:
+      213: 8046996169137604884
+    second: chess_35
+  - first:
+      213: 5872733320206883045
+    second: chess_36
+  - first:
+      213: 3426673057031193222
+    second: chess_37
+  - first:
+      213: -4250608721475785846
+    second: chess_38
+  - first:
+      213: 7090285132957640149
+    second: chess_39
+  - first:
+      213: 1444530959635917442
+    second: chess_40
+  - first:
+      213: -2906039245176912533
+    second: chess_41
+  - first:
+      213: -2082321528312565666
+    second: chess_42
+  - first:
+      213: -7168042603588504237
+    second: chess_43
+  - first:
+      213: 8239782983511354919
+    second: chess_44
+  - first:
+      213: -4402112065906295635
+    second: chess_45
+  - first:
+      213: -7802314638460869171
+    second: chess_46
+  - first:
+      213: 7949184952292907033
+    second: chess_47
+  - first:
+      213: -7914067568195529349
+    second: chess_48
+  - first:
+      213: 7661537175165021524
+    second: chess_49
+  - first:
+      213: 6152667415373979463
+    second: chess_50
+  - first:
+      213: 9048620616664117084
+    second: chess_51
+  - first:
+      213: 1389282925048684562
+    second: chess_52
+  - first:
+      213: -9131986222706222155
+    second: chess_53
+  - first:
+      213: 6575362074643993857
+    second: chess_54
+  - first:
+      213: 6470158346647724820
+    second: chess_55
+  - first:
+      213: 3747436506966352324
+    second: chess_56
+  - first:
+      213: 2160403479653414275
+    second: chess_57
+  - first:
+      213: 8540675925938541433
+    second: chess_58
+  - first:
+      213: -6385276263693419676
+    second: chess_59
+  - first:
+      213: 96625530050422798
+    second: chess_60
+  - first:
+      213: -6177685171519827750
+    second: chess_61
+  - first:
+      213: -4861715351157753683
+    second: chess_62
+  - first:
+      213: 6437939738939504923
+    second: chess_63
+  - first:
+      213: -3910295521204572563
+    second: chess_64
+  - first:
+      213: 6783825795879771645
+    second: chess_65
+  - first:
+      213: 6339680002974045566
+    second: chess_66
+  - first:
+      213: 93479782325979439
+    second: chess_67
+  - first:
+      213: -3974287100843552195
+    second: chess_68
+  - first:
+      213: 1233894092777913010
+    second: chess_69
+  - first:
+      213: 5298998856320734836
+    second: chess_70
+  - first:
+      213: -9085039858288864732
+    second: chess_71
+  - first:
+      213: 4162723970157728752
+    second: chess_72
+  - first:
+      213: -8933169365744667895
+    second: chess_73
+  - first:
+      213: -6605096856704741888
+    second: chess_74
+  - first:
+      213: -1964839998737243210
+    second: chess_75
+  - first:
+      213: 833704780415512176
+    second: chess_76
+  - first:
+      213: 4785410746520290724
+    second: chess_77
+  - first:
+      213: 1279342800864398601
+    second: chess_78
+  - first:
+      213: 6048211838041155343
+    second: chess_79
+  - first:
+      213: -4580671239228788104
+    second: chess_80
+  - first:
+      213: -1174929852476268964
+    second: chess_81
+  - first:
+      213: 2982779622567285538
+    second: chess_82
+  - first:
+      213: -5073228180932410587
+    second: chess_83
+  - first:
+      213: 3819856733019320301
+    second: chess_84
+  - first:
+      213: 6374317057809862877
+    second: chess_85
+  - first:
+      213: 2388887911755308355
+    second: chess_86
+  - first:
+      213: 3578101958101410481
+    second: chess_87
+  - first:
+      213: -1210954042547770907
+    second: chess_88
+  - first:
+      213: 8342026106784039110
+    second: chess_89
+  - first:
+      213: 6820997290491249532
+    second: chess_90
+  - first:
+      213: -2932669064050338359
+    second: chess_91
+  - first:
+      213: -8176868218383409114
+    second: chess_92
+  - first:
+      213: 8165760789509530749
+    second: chess_93
+  - first:
+      213: 7602793264592593401
+    second: chess_94
+  - first:
+      213: -2380947976962127692
+    second: chess_95
+  - first:
+      213: -464124207600547708
+    second: chess_96
+  - first:
+      213: -6684363685810044133
+    second: chess_97
+  - first:
+      213: 4239489162671511371
+    second: chess_98
+  - first:
+      213: 4965439534350744375
+    second: chess_99
+  - first:
+      213: 7945809722929434315
+    second: chess_100
+  - first:
+      213: -2864172215795913451
+    second: chess_101
+  - first:
+      213: -447710137078384613
+    second: chess_102
+  - first:
+      213: -4065381362067887852
+    second: chess_103
+  - first:
+      213: 9178403765884970016
+    second: chess_104
+  - first:
+      213: 6996717185598234875
+    second: chess_105
+  - first:
+      213: 3213237114460066907
+    second: chess_106
+  - first:
+      213: 8228887772098042941
+    second: chess_107
+  - first:
+      213: -1968259799063513832
+    second: chess_108
+  - first:
+      213: -7898921642963165748
+    second: chess_109
+  - first:
+      213: -2766835855990211198
+    second: chess_110
+  - first:
+      213: -4655860762302944020
+    second: chess_111
+  - first:
+      213: 5328821080067004085
+    second: chess_112
+  - first:
+      213: -3798019845171485565
+    second: chess_113
+  - first:
+      213: 7619400009237448597
+    second: chess_114
+  - first:
+      213: -2173878826753968322
+    second: chess_115
+  - first:
+      213: -3787578433750910192
+    second: chess_116
+  - first:
+      213: -1693471237991101559
+    second: chess_117
+  - first:
+      213: -5033015035411407393
+    second: chess_118
+  - first:
+      213: 4285648779314817794
+    second: chess_119
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -40,8 +400,8 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
-  spriteExtrude: 1
+  spriteMode: 2
+  spriteExtrude: 2
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
@@ -58,7 +418,7 @@ TextureImporter:
   compressionQualitySet: 0
   textureFormatSet: 0
   platformSettings:
-  - serializedVersion: 2
+  - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -69,7 +429,8 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-  - serializedVersion: 2
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -80,9 +441,31 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: chess_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1920
+        height: 1080
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8e92bf7b87508d46ad9b44cda0c272a
+      internalID: 3126791905082641082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []

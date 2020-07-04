@@ -1,440 +1,238 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChessController : MonoBehaviour
-{
+public class ChessController : MonoBehaviour {
+    private readonly Vector2 startPos = new Vector2(-8.16f, -8.12f);   //big crutch, but it’s easier
+    private readonly Vector2 offsetX = new Vector2(2.5142860f, 0);
+    private readonly Vector2 offsetY = new Vector2(0, 2.525714f);
+
     public Vector2[,] validPos = new Vector2[8, 8];
-    private readonly string[,] pieceClass = ChessConfig.GetDesk();
+    public Field[,] fields = new Field[8, 8];
+    public string[,] desk = new string[8, 8];
+         
+    [SerializeField] private GameObject[] red = new GameObject[2];
+    [SerializeField] private GameObject[] black = new GameObject[2];
+    [SerializeField] private GameObject pieceMark = null;
+    [SerializeField] private GameObject stepMark = null;
+    [SerializeField] private GameObject eatMark = null;
+    [SerializeField] private TextManadger text = null;
 
-    private readonly Vector2 startPos = new Vector2(-4.08f*2, -4.06f*2);
-    private readonly Vector2 offsetX = new Vector2(1.2571430f*2, 0);
-    private readonly Vector2 offsetY = new Vector2(0, 1.262857f*2);
+    private List<GameObject> allMarks = new List<GameObject>();
+    private Dictionary<string, List<Piece>> teams = new Dictionary<string, List<Piece>>() { ["red"] = new List<Piece>(),
+                                                                                            ["black"] = new List<Piece>()};
+    private int turn = 0;
 
-    private List<Pieces> redTeam = new List<Pieces>();
-    private List<Pieces> blackTeam = new List<Pieces>();
-    private List<GameObject> potentialPiece = new List<GameObject>();
-    private List<string> coord = new List<string>();
-    public List<string> firstLinePawn = new List<string>();
-
-
-    private GameObject desk;
-    public GameObject black;
-    public GameObject red;
-    public GameObject white;
-    public Pieces forMove;
-    public string turn;
-    
-    // Start is called before the first frame update
-    void Start(){
-        turn = "black";
-        desk = gameObject;
+    void Start() {
         FillLocation();
-        FirstLinePawn();
-        PlaceBlack();
-        PlaceRed();
-        SelectTeam();
+        StartNewGame();
+    }
+    
+    private void StartNewGame() {
+        Clear();
+
+        text.Introduction();
+        PlacePiece(red, ChessConfig.GetKingCoord("red"));
+        PlacePiece(black, ChessConfig.GetKingCoord("black"));
         SwapTurn();
-        //TestLocation();
+        //Debug.Log(Enumerable.SequenceEqual(new int[] { 1, 2, 3 }, new int[] { 1, 3, 3 }));
+    }
+
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
     }
 
     private void FillLocation() {
         validPos[0, 0] = startPos;
+        fields[0, 0] = new Field(0, 0, ChessConfig.GetFieldType(0, 0));
+
         for (int i = 0; i < 8; i++) {
             for (int j = 1; j < 8; j++) {
                 validPos[i, j] = validPos[i, j - 1] + offsetY;
+                fields[i, j] = new Field(i, j, ChessConfig.GetFieldType(i, j));
+                desk[i, j] = " ";
             }
-            if (i < 7)
+            if (i < 7) {
                 validPos[i + 1, 0] = validPos[i, 0] + offsetX;
-        }
-    }
-
-    public void Move(int x, int z) {
-        foreach (GameObject go in potentialPiece) {
-            Destroy(go);
-        }
-        if (turn == "red") {
-            foreach (Pieces p in blackTeam) {
-                if (p.x == x && p.y == z) {
-                    blackTeam.Remove(p);
-                    Destroy(p.me);
-                    if (p.isOurKing)
-                        Debug.Log("BlackLose");
-                    break;
-                }
-            }
-        }
-        else if (turn == "black") {
-            foreach (Pieces p in redTeam) {
-                if (p.x == x && p.y == z) {
-                    redTeam.Remove(p);
-                    Destroy(p.me);
-                    if (p.isOurKing)
-                        Debug.Log("RedLose");
-                    break;
-                }
-            }
-        }
-        forMove.targetPosition = validPos[x, z];
-        forMove.isMoving = true;
-    }
-
-    public void TakePiece(Pieces curr) {
-        foreach(GameObject p in potentialPiece) {
-            Destroy(p);
-        }
-        forMove = curr;
-        coord.Clear();
-        foreach (Pieces p in redTeam) {
-            coord.Add(p.x.ToString() + p.y);
-        }
-        foreach (Pieces p in blackTeam) {
-            coord.Add(p.x.ToString() + p.y);
-        }
-
-        CreateValidWay(curr.x, curr.y);
-    }
-
-    public void CreateValidWay(int x, int z) {
-        switch (pieceClass[x, z]) {
-            case "knight":
-                VariantKnightStep(x, z);
-                break;
-            case "rook":
-                VariantRookStep(x, z);
-                break;
-            case "pawn":
-                VariantPawnStep(x, z);
-                break;
-            case "king":
-                VariantKingStep(x, z);
-                break;
-            case "queen":
-                VariantQueenStep(x, z);
-                break;
-            case "bishop":
-                VariantBishopStep(x, z);
-                break;
-            default:
-                Debug.Log("WARNING!!! Something wrong in CreateValidWay");
-                break;
-        }
-    }
-
-    //не смотри на это гавно!
-    private void VariantKnightStep(int x, int z) {
-        if (x + 1 < 8 && z + 2 < 8) {
-            if (coord.IndexOf((x + 1).ToString() + (z + 2)) >= 0)
-                LastWayCheck(x + 1, z + 2);
-            else
-                PlaceWhite(x + 1, z + 2);
-        }
-        if (x + 2 < 8 && z + 1 < 8) {
-            if (coord.IndexOf((x + 2).ToString() + (z + 1)) >= 0)
-                LastWayCheck(x + 2, z + 1);
-            else 
-                PlaceWhite(x + 2, z + 1);
-        }
-        if (x + 1 < 8 && z - 2 >= 0) {
-            if (coord.IndexOf((x + 1).ToString() + (z - 2)) >= 0)
-                LastWayCheck(x + 1, z - 2);
-            else
-                PlaceWhite(x + 1, z - 2);
-        }
-        if (x + 2 < 8 && z - 1 >= 0) {
-            if (coord.IndexOf((x + 2).ToString() + (z - 1)) >= 0)
-                LastWayCheck(x + 2, z - 1);
-            else
-                PlaceWhite(x + 2, z - 1);
-        }
-        if (x - 1 >= 0 && z - 2 >= 0) {
-            if (coord.IndexOf((x - 1).ToString() + (z - 2)) >= 0)
-                LastWayCheck(x - 1, z - 2);
-            else
-                PlaceWhite(x - 1, z - 2);
-        }
-        if (x - 2 >= 0 && z - 1 >= 0) {
-            if (coord.IndexOf((x - 2).ToString() + (z - 1)) >= 0)
-                LastWayCheck(x - 2, z - 1);
-            else
-                PlaceWhite(x - 2, z - 1);
-        }
-        if (x - 1 >= 0 && z + 2 < 8) {
-            if (coord.IndexOf((x - 1).ToString() + (z + 2)) >= 0)
-                LastWayCheck(x - 1, z + 2);
-            else
-                PlaceWhite(x - 1, z + 2);
-        }
-        if (x - 2 >= 0 && z + 1 < 8) {
-            if (coord.IndexOf((x - 2).ToString() + (z + 1)) >= 0)
-                LastWayCheck(x - 2, z + 1);
-            else
-                PlaceWhite(x - 2, z + 1);
-        }
-    }
-    private void VariantRookStep(int x, int z) {
-        int i = 0;
-
-        for (i = z - 1; i >= 0; i--) {
-            int temp = coord.IndexOf(x.ToString() + i);
-            if (temp < 0)
-                PlaceWhite(x, i);
-            else {
-                LastWayCheck(x, i);
-                break;
-            }
-        }
-        for (i = z + 1; i < 8; i++) {
-            int temp = coord.IndexOf(x.ToString() + i);
-            if (temp < 0)
-                PlaceWhite(x, i);
-            else {
-                LastWayCheck(x, i);
-                break;
-            }
-        }
-        for (i = x - 1; i >= 0; i--) {
-            int temp = coord.IndexOf(i.ToString() + z);
-            if (temp < 0)
-                PlaceWhite(i, z);
-            else {
-                LastWayCheck(i, z);
-                break;
-            }
-        }
-        for (i = x + 1; i < 8; i++) {
-            int temp = coord.IndexOf(i.ToString() + z);
-            if (temp < 0)
-                PlaceWhite(i, z);
-            else {
-                LastWayCheck(i, z);
-                break;
+                fields[i + 1, 0] = new Field(i + 1, 0, ChessConfig.GetFieldType(i + 1, 0));
             }
         }
     }
-    private void VariantPawnStep(int x, int z) {
-        if (turn == "red") {
-            if (coord.IndexOf((x).ToString() + (z + 1)) < 0) {
-                PlaceWhite(x, z + 1);
-                if (coord.IndexOf((x).ToString() + (z + 2)) < 0 && firstLinePawn.IndexOf(x.ToString() + z) >= 0) {
-                    PlaceWhite(x, z + 2);
-                }
-            }
-            if (x - 1 >= 0 && z + 1 < 8) {
-                if (coord.IndexOf((x - 1).ToString() + (z + 1)) >= 0)
-                    LastWayCheck(x - 1, z + 1);
-            }
-            if (x + 1 < 8 && z + 1 < 8) {
-                if (coord.IndexOf((x + 1).ToString() + (z + 1)) >= 0)
-                    LastWayCheck(x + 1, z + 1);
-            }
+
+    private void PlacePiece(GameObject[] piece, int[] coord) {
+        int col = coord[0];
+        int row1 = coord[1];
+        int row2 = coord[2];
+
+        CreatePiece(piece[1], col, row1, true);                           // put OurKing 
+
+        for (int i = (col + 1) % 8; i != col; i = (i + 1) % 8) {       //put others piece
+            CreatePiece(piece[0], i, row1);
+            CreatePiece(piece[0], i, row2);
         }
 
-        if (turn == "black") {
-            if (coord.IndexOf((x).ToString() + (z - 1)) < 0) {
-                PlaceWhite(x, z - 1);
-                if (coord.IndexOf((x).ToString() + (z - 2)) < 0 && firstLinePawn.IndexOf(x.ToString() + z) > 0) {
-                    PlaceWhite(x, z - 2);
-                }
-            }
-            if (x - 1 >= 0 && z - 1 >= 0) {
-                if (coord.IndexOf((x - 1).ToString() + (z - 1)) >= 0)
-                    LastWayCheck(x - 1, z - 1);
-            }
-            if (x + 1 < 8 && z - 1 >= 0) {
-                if (coord.IndexOf((x + 1).ToString() + (z - 1)) >= 0)
-                    LastWayCheck(x + 1, z - 1);
-            }
-        }
-    }
-    private void VariantKingStep(int x, int z) {
-        for (int j = -1; j <= 1; j++) {
-            for (int i = -1; i <= 1; i++) {
-                if (x + j >= 0 && x + j < 8 && z + i >= 0 && z + i < 8) {
-                    if (coord.IndexOf((x + j).ToString() + (z + i)) >= 0)
-                        LastWayCheck(x + j, z + i);
-                    else
-                        PlaceWhite(x + j, z + i);
-                }
-            }
-        }
-    }
-    private void VariantQueenStep(int x, int z) {
-        VariantRookStep(x, z);
-        VariantBishopStep(x, z);
-    }
-    private void VariantBishopStep(int x, int z) {
-        int temp;
-        for (int i = 1; i < 8; i++ ) {
-            if (x + i < 8 && z + i < 8) {
-                temp = coord.IndexOf((x + i).ToString() + (z + i));
-                if (temp < 0)
-                    PlaceWhite(x + i, z + i);
-                else {
-                    LastWayCheck(x + i, z + i);
-                    break;
-                }
-            }
-            else
-                break;
-        }
-
-        for (int i = 1; i < 8; i++ ) {
-            if (x + i < 8 && z - i >= 0) {
-                temp = coord.IndexOf((x + i).ToString() + (z - i));
-                if ( temp < 0)
-                    PlaceWhite(x + i, z - i);
-                else {
-                    LastWayCheck(x + i, z - i);
-                    break;
-                }
-            }
-            else
-                break;
-        }
-
-        for (int i = 1; i < 8; i++ ) {
-            if (x - i >= 0 && z - i >= 0) {
-                temp = coord.IndexOf((x - i).ToString() + (z - i));
-                    if (temp < 0)
-                    PlaceWhite(x - i, z - i);
-                else {
-                    LastWayCheck(x - i, z - i);
-                    break;
-                }
-            }
-            else
-                break;
-        }
-
-        for (int i = 1; i < 8; i++ ) {
-            if (x - i >= 0 && z + i < 8) {
-                temp = coord.IndexOf((x - i).ToString() + (z + i));
-                if (temp < 0)
-                    PlaceWhite(x - i, z + i);
-                else {
-                    LastWayCheck(x - i, z + i);
-                    break;
-                }
-            }
-            else
-                break;
-        }
+        CreatePiece(piece[0], col, row2);                                 //put last piece
     }
 
-    private void LastWayCheck(int x, int z) {
-        string side = "white";
-        foreach (Pieces p in redTeam) {
-            if (p.x == x) {
-                if (p.y == z)
-                    side = "red";
-            }
-        }
-        foreach (Pieces p in blackTeam) {
-            if (p.x == x) {
-                if (p.y == z)
-                    side = "black";
-            }
-        }
-
-        if (side == "white") {
-            Debug.Log("Somthing wrong in LastWayCheck!");
-        }
-
-        if (forMove.team == side)
-            return;
-        else {
-            PlaceWhite(x, z);
-        }
+    private void CreatePiece(GameObject piece, int x, int y, bool isKing = false) {
+        GameObject go = Instantiate(piece, validPos[x, y], Quaternion.identity, gameObject.transform);
+        Piece p = go.GetComponent<Piece>();
+        p.x = x;
+        p.y = y;
+        desk[x, y] = p.team;
+        p.isOurKing = isKing;
+        teams[p.team].Add(p);
     }
-
 
     public void SwapTurn() {
-        if (turn == "black") {
-            foreach (Pieces p in redTeam) {
-                p.isActive = true;
-            }
-            foreach (Pieces p in blackTeam) {
-                p.isActive = false;
-            }
-            turn = "red";
+        turn++;
+        if (turn % 2 != 0) {
+            SetPieceActive("red", true);
+            SetPieceActive("black", false);
         }
-        else if (turn == "red") {
-            foreach (Pieces p in redTeam) {
-                p.isActive = false;
-            }
-            foreach (Pieces p in blackTeam) {
-                p.isActive = true;
-            }
-            turn = "black";
-            ChessAI ai = new ChessAI(redTeam, blackTeam);
-            ai.CalcStep(blackTeam);
+        else {
+            SetPieceActive("red", false);
+            SetPieceActive("black", true);
         }
     }
 
-    private void SelectTeam() {
-        Pieces p;
-        foreach (GameObject go in GameObject.FindGameObjectsWithTag("RedTeam")) {
-            p = go.GetComponent<Pieces>();
-            redTeam.Add(p);
-            p.team = "red";
-        }
-        foreach (GameObject go in GameObject.FindGameObjectsWithTag("BlackTeam")) {
-            p = go.GetComponent<Pieces>();
-            blackTeam.Add(p);
-            p.team = "black";
+    private void SetPieceActive(string color, bool isActive) {
+        foreach (Piece p in teams[color]) {
+            p.isActive = isActive;
         }
     }
 
-    private void PlaceBlack() {
-        GameObject king = Instantiate(black, validPos[0, 7], Quaternion.identity, desk.transform);
-        king.GetComponent<Pieces>().isOurKing = true;
-        king.transform.localScale += new Vector3(0.4f, -0.1f, 0);
-        for (int i = 1; i < 8; i++) {
-            Instantiate(black, validPos[i, 7], Quaternion.identity, desk.transform);
-            Instantiate(black, validPos[i, 6], Quaternion.identity, desk.transform);
-        }
-        Instantiate(black, validPos[0, 6], Quaternion.identity, desk.transform);
-    }
-
-    private void PlaceRed() { 
-        GameObject king = Instantiate(red, validPos[7, 0], Quaternion.identity, desk.transform);
-        king.GetComponent<Pieces>().isOurKing = true;
-        king.transform.localScale += new Vector3(0.4f, -0.1f, 0);
-        for (int i = 0; i < 7; i++) {
-            Instantiate(red, validPos[i, 0], Quaternion.identity, desk.transform);
-            Instantiate(red, validPos[i, 1], Quaternion.identity, desk.transform);
-        }
-        Instantiate(red, validPos[7, 1], Quaternion.identity, desk.transform);
-    }
-
-    private void PlaceWhite(int x, int z) {
-        potentialPiece.Add(Instantiate(white, (Vector3)validPos[x, z] - new Vector3(0, 0, 0.05f), Quaternion.identity, desk.transform));
-    }
-
-    private void TestLocation() {
-        foreach (Vector3 v in validPos) {
-            Instantiate(red, v, Quaternion.identity, desk.transform);
-        }
-    }
-
-    private void FirstLinePawn() {
-        firstLinePawn.Clear();
+    public int[] FindCoord(Vector2 piecePosition) {
         for (int i = 0; i < 8; i++) {
-            if (pieceClass[i, 1] == "pawn") 
-                firstLinePawn.Add(i.ToString() + 1);
-            if (pieceClass[i, 6] == "pawn")
-                firstLinePawn.Add( i.ToString() + 6);
+            if ((int)validPos[i, 0].x == (int)piecePosition.x) {
+                for (int j = 0; j < 8; j++) {
+                    if ((int)validPos[i, j].y == (int)piecePosition.y) {
+                        return new int[] { i, j };
+                    }
+                }
+            }
+        }
+        throw new Exception($"Something goes Wrong: ChessController.FindCoord can't find coord for Vector {piecePosition}");
+    }
+
+    public void MarkSelectedPiece(Piece piece) {
+        AllMarksClear();
+
+        allMarks.Add(Instantiate(pieceMark, validPos[piece.x, piece.y], Quaternion.identity, piece.gameObject.transform));
+
+        foreach (StepData step in fields[piece.x, piece.y].posibleSteps) {
+            string checkResult = StepCheck(piece.x, piece.y, step.x, step.y, step.isPawnAtack);
+            if (checkResult == "step") {
+                allMarks.Add(Instantiate(stepMark, validPos[step.x, step.y], Quaternion.identity, piece.gameObject.transform));
+            }
+            else if (checkResult == "eat") {
+                allMarks.Add(Instantiate(eatMark, validPos[step.x, step.y], Quaternion.identity, piece.gameObject.transform));
+            }
         }
     }
 
-    private void TestLocation(string piece) {
+    private string StepCheck(int xStart, int yStart, int xFinish, int yFinish, bool isPawnAtack) {
+        string startType = fields[xStart, yStart].type;
+        string startColor = desk[xStart, yStart];
+        string finishColor = desk[xFinish, yFinish];
+
+        if (startColor == finishColor)
+            return " ";
+
+        if (startType == "king" || startType == "knight") {
+            if (finishColor == " ")
+                return "step";
+            else
+                return "eat";
+        }
+
+        if (startType == "pawn") {
+            if (startColor == "red" && yFinish < yStart)
+                return " ";
+            if (startColor == "red" && yFinish < yStart)
+                return " ";
+            if (isPawnAtack && finishColor == " ")
+                return " ";
+            if (!isPawnAtack && finishColor != " ")
+                return " ";
+        }
+        
+        Vector2 start = new Vector2(xStart, yStart);
+        Vector2 finish = new Vector2(xFinish, yFinish);
+        Vector2 direction = start - finish;               //step direction vector
+        Vector2 normal = direction / direction.magnitude; //normalized vector
+
+        int x = (int)Math.Round(normal.x);
+        int y = (int)Math.Round(normal.y);
+
+        xFinish += x;                         //check the way from start to finish
+        yFinish += y;
+        while (xFinish != xStart || yFinish != yStart) {
+            if (desk[xFinish, yFinish] != " ")
+                return " ";
+            xFinish += x;
+            yFinish += y;
+        }
+
+        if (finishColor == " ")
+            return "step";
+        return "eat";
+        
+    }
+
+    public void DeskChange(int x, int y, int[] newCoord) {
+        desk[newCoord[0], newCoord[1]] = desk[x, y];
+        desk[x, y] = " ";
+    }
+
+    public void AllMarksClear() {
+        foreach (GameObject go in allMarks) {
+            Destroy(go);
+        }
+        allMarks.Clear();
+    }
+
+    public Piece GetTeams(string color, Vector3 position) {
+        return teams[color].Find(p=> p.transform.position == position);
+    }
+
+    public void GameOver(string color) {
+        if (color == "black")
+            text.RedWin();
+        else if (color == "red")
+            text.BlackWin();
+        Invoke("StartNewGame", 5f);
+    }
+
+    private void Clear() {
+        AllMarksClear();
+        foreach (List<Piece> list in teams.Values) {
+            foreach (Piece p in list) {
+                Destroy(p.gameObject);
+            }
+            list.Clear();
+        }
+
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (pieceClass[i, j] == piece)
-                    Instantiate(red, validPos[i, j], Quaternion.identity, desk.transform);
+                desk[i, j] = " ";
             }
         }
     }
+
+    private void PrintDesk() {
+        string text = "\n";
+        for (int i = 7; i >= 0; i--) {
+            for (int j = 0; j < 8; j++) {
+                text += desk[j, i] + " | ";
+            }
+            text += "\n";
+        }
+        Debug.Log(text);
+    }
 }
+
+  
