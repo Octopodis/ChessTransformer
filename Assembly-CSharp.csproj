@@ -62,6 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\ChessAI.cs" />
     <Compile Include="Assets\Scripts\ChessConfig.cs" />
     <Compile Include="Assets\Scripts\ChessController.cs" />
     <Compile Include="Assets\Scripts\Field.cs" />

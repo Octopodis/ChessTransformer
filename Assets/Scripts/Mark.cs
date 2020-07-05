@@ -38,11 +38,7 @@ public class Mark : MonoBehaviour
     }
 
     private void Eat(string color) {
-        Piece p = master.GetTeams(color, gameObject.transform.position);
-        if (!p.isOurKing)
-            Destroy(p.gameObject);
-        else
-            master.GameOver(color);
+        master.Destroy(color, gameObject.transform.position);
     }
 
     private void Move() {

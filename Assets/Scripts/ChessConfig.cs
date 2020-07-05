@@ -10,8 +10,8 @@ public class ChessConfig {
         ["bishop"] = 3,
         ["rook"] = 4,
         ["queen"] = 5,
-        ["orginary"] = 2,          //nominal power of piece (sum whith power of type)
-        ["isOurKing"] = 100
+        ["ordinary"] = 2,          //nominal power of piece (sum whith power of type)
+        ["Main"] = 100
     };
 
     private static string[,] desk = new string[8, 8] {
@@ -28,10 +28,6 @@ public class ChessConfig {
     private static int[] redKingCoord = new int[] { 7, 0, 1};       //column, row1 , row2
     private static int[] blackKingCoord = new int[] { 0, 7, 6};     //column, row1 , row2
     private static Vector3 kingIncrease = new Vector3(0.2f, -0.05f, 0);
-
-    public static string[,] GetDesk() {
-        return desk;
-    }
 
     public static string GetFieldType(int x, int y) {
         return desk[x, y];

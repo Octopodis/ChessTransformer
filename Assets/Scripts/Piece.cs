@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour
 {
-    public bool isOurKing = false;
+    public bool isMain = false;
     public bool isMoving = false;
     public bool isActive = false;
 
@@ -12,7 +12,7 @@ public class Piece : MonoBehaviour
     public int y;
     private float stepValue = 0.5f;
 
-    public Vector2 targetPosition;
+    public Vector3 targetPosition;
 
     public string team;
 
@@ -25,7 +25,7 @@ public class Piece : MonoBehaviour
     private void FixedUpdate() {
         if (isMoving) {
             transform.position = Vector3.MoveTowards(gameObject.transform.position, targetPosition, stepValue);
-            if ((Vector2)gameObject.transform.position == targetPosition) {
+            if (gameObject.transform.position == targetPosition) {
                 isMoving = false;
                 int[] newCoord = (master.FindCoord(gameObject.transform.position));
                 master.DeskChange(x, y, newCoord);

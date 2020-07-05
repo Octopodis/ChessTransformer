@@ -11,16 +11,10 @@ public class TextManadger : MonoBehaviour
         text = gameObject.GetComponent<Text>();
     }
 
-    public void RedWin() {
-        text.text = "GameOver\nRedWin";
+    public void WinText(string color) {
+        text.text = $"GameOver\n{color}Win";
         gameObject.SetActive(true);
-        Invoke("Off", 8f);
-    }
-
-    public void BlackWin() {
-        text.text = "GameOver\nBlackWin";
-        gameObject.SetActive(true);
-        Invoke("Off", 8f);
+        Invoke("Off", 5f);
     }
 
     public void Introduction() {

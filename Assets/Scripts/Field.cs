@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class Field {
     public string type;
-    private int x, y;
+    private int x;
+    private int y;
 
     public List<StepData> posibleSteps { get; private set; }
 
@@ -43,14 +44,12 @@ public class Field {
 
     private void AddStep(int x, int y, bool isPawnAtack = false) {   //isPawnAtack = true in case of a pawn move-attack
         if (x < 8 && x >= 0 && y < 8 && y >= 0) {
-            int score = CalcScoreDifference(type, x, y);
+            string newType = ChessConfig.GetFieldType(x, y);
+
+            //Calculation the difference between the power of the piece before step and after
+            int score = ChessConfig.GetPiecePower(type) - ChessConfig.GetPiecePower(newType); 
             posibleSteps.Add(new StepData(x, y, score, isPawnAtack));
         }
-    }
-
-    private int CalcScoreDifference(string type, int x, int y) {   //Calculation the difference between the power of the piece before step and after
-        string newType = ChessConfig.GetFieldType(x, y);
-        return ChessConfig.GetPiecePower(type) - ChessConfig.GetPiecePower(newType);
     }
 
     private void KnightStep(int x, int y) {
