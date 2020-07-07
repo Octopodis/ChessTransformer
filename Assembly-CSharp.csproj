@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\Mark.cs" />
     <Compile Include="Assets\Scripts\Piece.cs" />
     <Compile Include="Assets\Scripts\StepData.cs" />
+    <Compile Include="Assets\Scripts\StepsRemover.cs" />
     <Compile Include="Assets\Scripts\TextManadger.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>E:/Program files/Unity Hub/Project/ChessTransformer/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

@@ -94,9 +94,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be9b23d9b65758e46887cb531a93984a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOurKing: 0
+  isMain: 0
   isMoving: 0
   isActive: 0
+  x: 0
+  y: 0
+  targetPosition: {x: 0, y: 0, z: 0}
   team: black
 --- !u!58 &-5107508006904680655
 CircleCollider2D:

@@ -43,12 +43,12 @@ public class Field {
     }
 
     private void AddStep(int x, int y, bool isPawnAtack = false) {   //isPawnAtack = true in case of a pawn move-attack
-        if (x < 8 && x >= 0 && y < 8 && y >= 0) {
+        if (x < ChessConfig.size && x >= 0 && y < ChessConfig.size && y >= 0) {
             string newType = ChessConfig.GetFieldType(x, y);
-
+            
             //Calculation the difference between the power of the piece before step and after
-            int score = ChessConfig.GetPiecePower(type) - ChessConfig.GetPiecePower(newType); 
-            posibleSteps.Add(new StepData(x, y, score, isPawnAtack));
+            int score = ChessConfig.GetPiecePower(newType) - ChessConfig.GetPiecePower(type);
+            posibleSteps.Add(new StepData(x * 8 + y, this.x * 8 + this.y, score, isPawnAtack));
         }
     }
 
@@ -67,7 +67,7 @@ public class Field {
 
     }
     private void RookStep(int x, int y) {
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < ChessConfig.size; i++) {
             if (i != x)
                 AddStep(i, y);
             if (i != y)
@@ -118,7 +118,7 @@ public class Field {
             y2 = 0;
         }
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < ChessConfig.size; i++) {
             if (!(x1 + i == x && x2 - i == x && y1 + i == y && y2 + i == y)) {
                 AddStep(x1 + i, y1 + i);
                 AddStep(x2 - i, y2 + i);

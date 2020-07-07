@@ -7,9 +7,10 @@ public class ChessController : MonoBehaviour {
     private readonly Vector2 offsetX = new Vector2(2f, 0);
     private readonly Vector2 offsetY = new Vector2(0, 2f);
 
-    public Vector2[,] validPos = new Vector2[8, 8];
-    public Field[,] fields = new Field[8, 8];
-    public char[,] desk = new char[8, 8];
+    [HideInInspector] readonly public int size = ChessConfig.size;
+    public Vector2[,] validPos;
+    public Field[,] fields;
+    public char[,] desk; 
          
     [SerializeField] private GameObject[] red = new GameObject[2];
     [SerializeField] private GameObject[] black = new GameObject[2];
@@ -19,24 +20,30 @@ public class ChessController : MonoBehaviour {
     [SerializeField] private TextManadger text = null;
 
     private List<GameObject> allMarks = new List<GameObject>();
-    Dictionary<int, List<StepData>> allSteps = new Dictionary<int, List<StepData>>();
+    List<StepData> allSteps = new List<StepData>();
     private Dictionary<string, List<Piece>> teams = new Dictionary<string, List<Piece>>() { ["red"] = new List<Piece>(),
                                                                                             ["black"] = new List<Piece>()};
-    private int turn = 0;
+    private int turn;
+    private ChessAI ai;
 
     void Start() {
+        validPos = new Vector2[size, size];
+        fields = new Field[size, size];
+        desk = new char[size, size];
+
         FillLocation();
+        ai = new ChessAI(fields);
         StartNewGame();
     }
     
     private void StartNewGame() {
         Clear();
 
+        turn = 0;
         text.Introduction();
-        PlacePiece(red, ChessConfig.GetKingCoord("red"));
-        PlacePiece(black, ChessConfig.GetKingCoord("black"));
+        PlacePiece(red, ChessConfig.GetMainCoord("red"));
+        PlacePiece(black, ChessConfig.GetMainCoord("black"));
         SwapTurn();
-        //Debug.Log(Enumerable.SequenceEqual(new int[] { 1, 2, 3 }, new int[] { 1, 3, 3 }));
     }
 
     private void Update() {
@@ -48,8 +55,8 @@ public class ChessController : MonoBehaviour {
         validPos[0, 0] = startPos;
         fields[0, 0] = new Field(0, 0, ChessConfig.GetFieldType(0, 0));
 
-        for (int i = 0; i < 8; i++) {
-            for (int j = 1; j < 8; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 1; j < size; j++) {
                 validPos[i, j] = validPos[i, j - 1] + offsetY;
                 fields[i, j] = new Field(i, j, ChessConfig.GetFieldType(i, j));
                 desk[i, j] = ' ';
@@ -68,7 +75,7 @@ public class ChessController : MonoBehaviour {
 
         CreatePiece(piece[1], col, row1, true);                           // put OurKing 
 
-        for (int i = (col + 1) % 8; i != col; i = (i + 1) % 8) {       //put others piece
+        for (int i = (col + 1) % size; i != col; i = (i + 1) % size) {       //put others piece
             CreatePiece(piece[0], i, row1);
             CreatePiece(piece[0], i, row2);
         }
@@ -81,24 +88,42 @@ public class ChessController : MonoBehaviour {
         Piece p = go.GetComponent<Piece>();
         p.x = x;
         p.y = y;
-        desk[x, y] = p.team[0];
-        if (isKing)  
+        if (isKing) {
             p.isMain = isKing;
+            desk[x, y] = char.ToUpper(p.team[0]);
+        }
+        else
+            desk[x, y] = p.team[0];
         teams[p.team].Add(p);
     }
 
     public void SwapTurn() {
         turn++;
         if (turn % 2 != 0) {
-            allSteps = GetAllSteps('r', desk);
+            allSteps = StepRemover.GetRemainningSteps('r', desk, fields);
             SetPieceActive("red", true);
             SetPieceActive("black", false);
         }
         else {
+            allSteps = StepRemover.GetRemainningSteps('b', desk, fields);
             SetPieceActive("red", false);
             SetPieceActive("black", true);
-            //ChessAI ai = new ChessAI(desk, fields, teams);
+            StepData nextStep = ai.CalcNextStep(desk);
+            Debug.Log(nextStep);
+            costil(nextStep);
         }
+    }
+
+    private void costil(StepData next) {
+        int x = next.begin / 8;
+        int y = next.begin % 8;
+        StepData nextStep = next;
+        Piece pi = teams["black"].Find(p => (p.x == x && p.y == y));
+        if (nextStep.stepType == "eat")
+            Destroy("red", validPos[nextStep.dest / 8, nextStep.dest % 8]);
+
+        pi.targetPosition = validPos[nextStep.dest / 8, nextStep.dest % 8];
+        pi.isMoving = true;
     }
 
     private void SetPieceActive(string color, bool isActive) {
@@ -107,117 +132,21 @@ public class ChessController : MonoBehaviour {
         }
     }
 
-    public Dictionary<int, List<StepData>> GetAllSteps(char color, char[,] currDesk) {
-        Dictionary<int, List<StepData>> allSteps = new Dictionary<int, List<StepData>>();
-        string checkResult = "";
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (currDesk[i, j] == color || currDesk[i, j] == Char.ToUpper(color)) {
-                    int crutch =  i * 8 +  j ;
-                    allSteps[crutch] = new List<StepData>();
-
-                    foreach (StepData sd in fields[i, j].posibleSteps) {
-                        checkResult = StepCheck(i, j, sd.x, sd.y, currDesk, sd.isPawnAtack);
-
-                        sd.eatScore = 0;
-                        if (checkResult == " ") {
-                            sd.stepType = null;
-                            continue;
-                        }
-
-                        sd.stepType = checkResult; 
-                        if (checkResult == "eat") {
-                            if (currDesk[sd.x, sd.y] == 'R' || currDesk[sd.x, sd.y] == 'B') 
-                                sd.eatScore = ChessConfig.GetPiecePower("Main") + ChessConfig.GetPiecePower(fields[i, j].type);
-                            else 
-                                sd.eatScore = ChessConfig.GetPiecePower("ordinary") + ChessConfig.GetPiecePower(fields[i, j].type);
-                        }
-                        allSteps[crutch].Add(sd);
-                    }
-                }
-            }
-        }
-        return allSteps;
-    }
-
-    public int[] FindCoord(Vector2 piecePosition) {
-        for (int i = 0; i < 8; i++) {
-            if ((int)validPos[i, 0].x == (int)piecePosition.x) {
-                for (int j = 0; j < 8; j++) {
-                if ((int)validPos[i, j].y == (int)piecePosition.y)
-                    return new int[] { i, j };
-                }
-            }
-        }
-        throw new Exception($"Something goes Wrong: ChessController.FindCoord can't find coord for Vector {piecePosition}");
-    }
-
     public void MarkSelectedPiece(Piece piece) {
         AllMarksClear();
         allMarks.Add(Instantiate(pieceMark, validPos[piece.x, piece.y], Quaternion.identity, piece.gameObject.transform));
 
-        int key = piece.x * 8 + piece.y ;
+        int key = piece.x * size + piece.y ;
 
-        Debug.Log(key);
-        TestDictionary();
-        Debug.Log(allSteps[key].Count);
-
-        foreach (StepData step in allSteps[key]) {
+        foreach (StepData step in allSteps) {
+            if (step.begin != key)
+                continue;
+            //Debug.Log($"step {step.x}  {step.y}  score {step.score}  eat{step.eatScore}");
             if (step.stepType == "step")
-                allMarks.Add(Instantiate(stepMark, validPos[step.x, step.y], Quaternion.identity, piece.gameObject.transform));
+                allMarks.Add(Instantiate(stepMark, validPos[step.dest / 8, step.dest % 8], Quaternion.identity, piece.gameObject.transform));
             else if (step.stepType == "eat")
-                allMarks.Add(Instantiate(eatMark, validPos[step.x, step.y], Quaternion.identity, piece.gameObject.transform));
+                allMarks.Add(Instantiate(eatMark, validPos[step.dest / 8, step.dest % 8], Quaternion.identity, piece.gameObject.transform));
         }
-    }
-
-    private string StepCheck(int xStart, int yStart, int xFinish, int yFinish, char[,] currDesk, bool isPawnAtack) {
-        string startType = fields[xStart, yStart].type;
-        char startColor = currDesk[xStart, yStart];
-        char finishColor = currDesk[xFinish, yFinish];
-
-        if (startColor == finishColor || startColor == char.ToUpper(finishColor) || char.ToUpper(startColor) == finishColor)
-            return " ";
-
-        if (startType == "king" || startType == "knight") {
-            if (finishColor == ' ')
-                return "step";
-            else
-                return "eat";
-        }
-
-        if (startType == "pawn") {
-            if ((startColor == 'r' || startColor == 'R') && yFinish < yStart)
-                return " ";
-            if ((startColor == 'b' || startColor == 'B') && yFinish > yStart) 
-                return " ";
-            if (isPawnAtack && finishColor == ' ')
-                return " ";
-            if (!isPawnAtack && finishColor != ' ')
-                return " ";
-        }
-        
-        Vector2 start = new Vector2(xStart, yStart);
-        Vector2 finish = new Vector2(xFinish, yFinish);
-        Vector2 direction = start - finish;               //step direction vector
-        Vector2 normal = direction / direction.magnitude; //normalized vector
-
-        int x = (int)Math.Round(normal.x);
-        int y = (int)Math.Round(normal.y);
-
-        xFinish += x;                         //check the way from start to finish
-        yFinish += y;
-        while (xFinish != xStart || yFinish != yStart) {
-            if (currDesk[xFinish, yFinish] != ' ')
-                return " ";
-            xFinish += x;
-            yFinish += y;
-        }
-
-        if (finishColor == ' ')
-            return "step";
-        return "eat";
-        
     }
 
     public void DeskChange(int x, int y, int[] newCoord) {
@@ -233,7 +162,7 @@ public class ChessController : MonoBehaviour {
     }
 
     public void Destroy(string color, Vector3 position) {
-        Piece p = teams[color].Find(elem=> elem.transform.position == position);
+        Piece p = teams[color].Find(elem => elem.transform.position == position);
         if (!p.isMain) {
             teams[color].Remove(p);
             Destroy(p.gameObject);
@@ -259,8 +188,8 @@ public class ChessController : MonoBehaviour {
             list.Clear();
         }
 
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 desk[i, j] = ' ';
             }
         }
@@ -269,21 +198,11 @@ public class ChessController : MonoBehaviour {
     private void PrintMass<T>(T[,] a) {
         string text = "\n";
         for (int i = 7; i >= 0; i--) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < size; j++) {
                 text += a[j, i] + " | ";
             }
             text += "\n";
         }
         Debug.Log(text);
     }
-
-    private void TestDictionary() {
-        string text = "";
-        foreach (int i in allSteps.Keys) {
-            text += i + " | ";
-        }
-        Debug.Log(text);
-    }
 }
-
-  

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4565134742610327538}
   - component: {fileID: 4295853463277202186}
   - component: {fileID: -7427306530362507008}
+  - component: {fileID: -1327615816424877334}
   m_Layer: 0
   m_Name: RedKing
   m_TagString: RedTeam
@@ -93,10 +94,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be9b23d9b65758e46887cb531a93984a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOurKing: 0
+  isMain: 0
   isMoving: 0
   isActive: 0
   x: 0
   y: 0
-  targetPosition: {x: 0, y: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
   team: red
+--- !u!61 &-1327615816424877334
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6468261704054070283}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.0000014305115, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.87337494, y: 1}
+  m_EdgeRadius: 0

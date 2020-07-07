@@ -4,36 +4,76 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ChessAI {
-    private int score;
-    private char[,] desk = new char[8, 8];
-    private Field[,] fields = new Field[8, 8];
+    readonly int size = ChessConfig.size;
 
-    public ChessAI(char[,] desk, Field[,] fields, int[] redMainCoord, int[] blackMainCoord) {
-        this.desk = CopyMass(desk);
-        this.desk[redMainCoord[0], redMainCoord[1]] = 'R';
-        this.desk[blackMainCoord[0], blackMainCoord[1]] = 'B';
-        PrintMass(this.desk);
+    private int depth;
+    private Field[,] fields;
+    private char[] teamQueue = new char[] { 'b', 'r' };
 
+    public ChessAI(Field[,] fields) {
         this.fields = fields;
+        this.depth = ChessConfig.baseDepthAI * 2;
     }
 
-    //public void CalcNextStep() {
-    //    CalcNextStep(desk);
-    //}
+    public StepData CalcNextStep(char[,] desk) {
+        char[,] virtualDesk;
+        List<StepData> allStep = StepRemover.GetRemainningSteps(teamQueue[depth % 2], desk, fields);
+        int score = -1000;
+        int temp;
+        StepData result = new StepData();
+        int count = 0;
 
-    //private void CalcNextStep(char [,] desk) {
-    //    Dictionary<int[], List<StepData>> allSteps = TakeAllSteps('b', desk);
-    //    foreach (int[] coord in allSteps.Keys) { 
-    //        char[,] tempDesk = CopyMass(desk);
-    //        tempDesk[]
-    //        TakeAllSteps('r', );
-    //    }
-    //}
+
+        foreach (StepData sd in allStep) {
+            virtualDesk = MakeVirtualStep(desk, sd);
+            temp = CalcNextStep(virtualDesk, sd, depth - 1, -1);
+            temp += sd.score + sd.eatScore;
+
+            if (score < temp) {
+                score = temp;
+                result = sd + temp;
+            }
+        }
+        count += allStep.Count;
+        Debug.Log(count);
+        count = 0;
+        return result;
+    }
+
+    private int CalcNextStep(char[,] desk, StepData prevStep, int depth, int c) {
+        char[,] virtualDesk;
+        List<StepData> allStep = StepRemover.GetRemainningSteps(teamQueue[depth % 2], desk, fields);
+        int score = -1000 * c;
+        int temp = 0;
+
+        foreach (StepData sd in allStep) {
+            virtualDesk = MakeVirtualStep(desk, sd);
+            if (depth - 1 > 0) {
+                temp += CalcNextStep(virtualDesk, sd, depth - 1, -c) * c;
+            }
+            else
+                temp = (sd.score + sd.eatScore) * c;
+
+            if (score >= temp) {
+                score = temp;
+            }
+        }
+        return score;
+    }
+
+    public char[,] MakeVirtualStep(char[,] desk, StepData step) {
+        char[,] newDesk = CopyMass(desk);
+        int x = step.begin / size;
+        int y = step.begin % size;
+        newDesk[step.dest / 8, step.dest % 8] = desk[x, y];
+        newDesk[x, y] = ' ';
+        return newDesk;
+    }
 
     private T[,] CopyMass<T>(T[,] mass) {
-        T[,] res = new T[8, 8];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        T[,] res = new T[size, size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 res[i, j] = mass[i, j];
             }
         }

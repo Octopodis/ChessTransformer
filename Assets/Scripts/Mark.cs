@@ -46,5 +46,4 @@ public class Mark : MonoBehaviour
         piece.isMoving = true;
         master.AllMarksClear();
     }
-
 }

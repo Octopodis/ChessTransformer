@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChessConfig {
+public static class ChessConfig {
+    public static readonly int size = 8;
+    public static int baseDepthAI = 1;
+
     private static Dictionary<string, int> piecesPower = new Dictionary<string, int>() {
         ["pawn"] = 1,
         ["king"] = 2,
@@ -25,9 +28,8 @@ public class ChessConfig {
         { "rook",   "knight", "bishop", "king",   "queen",  "king",   "pawn",   "knight"}
     };
 
-    private static int[] redKingCoord = new int[] { 7, 0, 1};       //column, row1 , row2
-    private static int[] blackKingCoord = new int[] { 0, 7, 6};     //column, row1 , row2
-    private static Vector3 kingIncrease = new Vector3(0.2f, -0.05f, 0);
+    private static int[] redMainCoord = new int[] { 7, 0, 1};       //column, row1 , row2
+    private static int[] blackMainCoord = new int[] { 0, 7, 6};     //column, row1 , row2
 
     public static string GetFieldType(int x, int y) {
         return desk[x, y];
@@ -37,16 +39,12 @@ public class ChessConfig {
         return piecesPower[piecesClass];
     }
 
-    public static int[] GetKingCoord(string team) {
+    public static int[] GetMainCoord(string team) {
         if (team == "red")
-            return redKingCoord;
+            return redMainCoord;
         else if (team == "black")
-            return blackKingCoord;
+            return blackMainCoord;
         else
             throw new System.Exception($"Something goes Wrong: team in ChessConfig.GetKingCoord = {team}");
-    }
-    
-    public static Vector3 GetKingSize() {
-        return kingIncrease;
     }
 }

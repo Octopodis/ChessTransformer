@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,7 +28,7 @@ public class Piece : MonoBehaviour
             transform.position = Vector3.MoveTowards(gameObject.transform.position, targetPosition, stepValue);
             if (gameObject.transform.position == targetPosition) {
                 isMoving = false;
-                int[] newCoord = (master.FindCoord(gameObject.transform.position));
+                int[] newCoord = (FindCoord(gameObject.transform.position));
                 master.DeskChange(x, y, newCoord);
                 x = newCoord[0];
                 y = newCoord[1];
@@ -39,6 +40,18 @@ public class Piece : MonoBehaviour
     private void OnMouseDown() {
         if (isActive)
         master.MarkSelectedPiece(this);
+    }
+
+    private int[] FindCoord(Vector2 piecePosition) {
+        for (int i = 0; i < ChessConfig.size; i++) {
+            if ((int)master.validPos[i, 0].x == (int)piecePosition.x) {
+                for (int j = 0; j < ChessConfig.size; j++) {
+                    if ((int)master.validPos[i, j].y == (int)piecePosition.y)
+                        return new int[] { i, j };
+                }
+            }
+        }
+        throw new Exception($"Something goes Wrong: ChessController.FindCoord can't find coord for Vector {piecePosition}");
     }
 
 }
