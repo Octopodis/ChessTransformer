@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class StepRemover {
-
     public static List<StepData> GetRemainningSteps(char color, char[,] currDesk, Field[,] fields) {
         List<StepData> allSteps = new List<StepData>();
         string pieceType;
@@ -19,12 +18,12 @@ public static class StepRemover {
 
                     foreach (StepData sd in fields[i, j].posibleSteps) {
                         pieceType = fields[i, j].type;
-                        x = sd.dest / 8;
-                        y = sd.dest % 8;
+                        x = sd.dest / size;
+                        y = sd.dest % size;
 
                         sd.stepType = StepCheck(i, j, x, y, currDesk, pieceType, sd.isPawnAtack);
-
                         sd.eatScore = 0;
+
                         if (sd.stepType == " ") {
                             sd.stepType = null;
                             continue;

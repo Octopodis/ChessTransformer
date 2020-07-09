@@ -23,10 +23,9 @@ public class ChessAI {
         StepData result = new StepData();
         int count = 0;
 
-
         foreach (StepData sd in allStep) {
             virtualDesk = MakeVirtualStep(desk, sd);
-            temp = CalcNextStep(virtualDesk, sd, depth - 1, -1);
+            temp = CalcNextStep(virtualDesk, depth - 1, -1);
             temp += sd.score + sd.eatScore;
 
             if (score < temp) {
@@ -40,7 +39,7 @@ public class ChessAI {
         return result;
     }
 
-    private int CalcNextStep(char[,] desk, StepData prevStep, int depth, int c) {
+    private int CalcNextStep(char[,] desk, int depth, int c) {
         char[,] virtualDesk;
         List<StepData> allStep = StepRemover.GetRemainningSteps(teamQueue[depth % 2], desk, fields);
         int score = -1000 * c;
@@ -48,14 +47,18 @@ public class ChessAI {
 
         foreach (StepData sd in allStep) {
             virtualDesk = MakeVirtualStep(desk, sd);
+            temp = (sd.score + sd.eatScore) * c;
             if (depth - 1 > 0) {
-                temp += CalcNextStep(virtualDesk, sd, depth - 1, -c) * c;
+                temp += CalcNextStep(virtualDesk, depth - 1, -c);
             }
-            else
-                temp = (sd.score + sd.eatScore) * c;
-
-            if (score >= temp) {
-                score = temp;
+            
+            if (c == 1) {
+                if (score <= temp) 
+                    score = temp;
+            }
+            else if (c == -1) {
+                if (score >= temp) 
+                    score = temp;
             }
         }
         return score;
