@@ -15,7 +15,7 @@ public class StepData : IComparable<StepData> {
     public StepData() { }
 
     public StepData(int dest, int begin, int score, bool isPawnAtack = false) {
-        this.dest = dest;
+        this.dest = dest; 
         this.begin = begin;
         this.score = score;
         this.isPawnAtack = isPawnAtack;
