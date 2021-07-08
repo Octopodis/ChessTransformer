@@ -10,7 +10,7 @@ public class ChessController : MonoBehaviour {
     [HideInInspector] readonly public int size = ChessConfig.size;
     public Vector2[,] validPos;
     public Field[,] fields;
-    public char[,] desk; 
+    public char[,] desk;  
          
     [SerializeField] private GameObject[] red = new GameObject[2];
     [SerializeField] private GameObject[] black = new GameObject[2];
